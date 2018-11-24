@@ -12,12 +12,13 @@ static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos
 void cursorEnterCallback( GLFWwindow *window, int entered );
 void mouseButtonCallback( GLFWwindow *window, int button, int action, int mods );
 void scrollCallback( GLFWwindow *window, double xoffset, double yoffset );
-
+GLfloat adjustY(double);// y coordinate adjustment
+void freeHandSketch(vector<vector<double>> positions);
+void drawPoint(double xpos, double ypos);
 
 int main( void )
 {
     GLFWwindow *window;
-    
     // Initialize the library
     if ( !glfwInit( ) )
     {
@@ -35,7 +36,8 @@ int main( void )
     
     // Make the window's context current
     glfwMakeContextCurrent( window );
-    //
+    
+    // Setup callbacks
     glfwSetCursorPosCallback( window, cursorPositionCallback );
     glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
     glfwSetCursorEnterCallback( window, cursorEnterCallback );
@@ -43,14 +45,14 @@ int main( void )
     glfwSetInputMode( window, GLFW_STICKY_MOUSE_BUTTONS, 1 );
     glfwSetScrollCallback( window, scrollCallback );
 
-    //
-    
+    // OpenGL specifics
     glViewport( 0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT ); // specifies the part of the window to which OpenGL will draw (in pixels), convert from normalised to pixels
     glMatrixMode( GL_PROJECTION ); // projection matrix defines the properties of the camera that views the objects in the world coordinate frame. Here you typically set the zoom factor, aspect ratio and the near and far clipping planes
-    glLoadIdentity( ); // replace the current matrix with the identity matrix and starts us a fresh because matrix transforms such as glOrpho and glRotate cumulate, basically puts us at (0, 0, 0)
+    glLoadIdentity(); // replace the current matrix with the identity matrix and starts us a fresh because matrix transforms such as glOrpho and glRotate cumulate, basically puts us at (0, 0, 0)
     glOrtho( 0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, 0, 1 ); // essentially set coordinate system
     glMatrixMode( GL_MODELVIEW ); // (default matrix mode) modelview matrix defines how your objects are transformed (meaning translation, rotation and scaling) in your world
     vector<vector<double>> postions;
+    
     // Loop until the user closes the window
     while ( !glfwWindowShouldClose( window ) )
     {
@@ -63,26 +65,16 @@ int main( void )
         tmppos.push_back(ypos);
         postions.push_back(tmppos);
         std::cout << tmppos[0] << " : " << tmppos[1] << std::endl;
-        glEnable( GL_POINT_SMOOTH );
-        glPointSize( 5 );
         
-        glBegin(GL_POINTS);
-        glColor4f(1,1,1,1);
-        glVertex2f((GLfloat)xpos,(GLfloat) ( -ypos + SCREEN_HEIGHT));
-        glEnd();
+        // Draw the guiding curve
+        drawPoint(xpos, ypos);
         
-        glEnable( GL_POINT_SMOOTH );
-        glBegin( GL_LINE_STRIP );
-        glColor3ub( 255, 0, 0 );
-        for( size_t i = 0; i < postions.size(); i += 2 )
-        {
-            glVertex2f( (GLfloat)postions[i][0], -(GLfloat)postions[i][1] + SCREEN_HEIGHT);
-        }
-        glEnd();
+        // Draw Buggy Freehand sketch lol
+        freeHandSketch(postions);
         
         // Swap front and back buffers
         glfwSwapBuffers( window );
-        
+    
         // Poll for and process events
         glfwPollEvents( );
     }
@@ -90,6 +82,30 @@ int main( void )
     glfwTerminate( );
     
     return 0;
+}
+
+GLfloat adjustY(double yVal){
+    return (GLfloat)(-yVal+ SCREEN_HEIGHT);
+}
+
+void drawPoint(double xpos, double ypos){
+    glEnable( GL_POINT_SMOOTH );
+    glPointSize( 5 );
+    glBegin(GL_POINTS);
+    glColor4f(1,0,0,1);
+    glVertex2f((GLfloat)xpos, adjustY(ypos));
+    glEnd();
+}
+
+void freeHandSketch(vector<vector<double>> positions){
+    glEnable( GL_POINT_SMOOTH );
+    glBegin( GL_LINE_STRIP );
+    glColor3ub( 255, 0, 0 );
+    for( size_t i = 0; i < positions.size(); i += 2 )
+    {
+        glVertex2f( (GLfloat)positions[i][0], adjustY(positions[i][1]));
+    }
+    glEnd();
 }
 
 static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos )
