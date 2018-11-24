@@ -119,7 +119,6 @@ static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos
     // drag positions
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
     {
-        cout<< "the actual fuck";
         vector <double> tmppos;
         tmppos.push_back(xpos);
         tmppos.push_back(ypos);
