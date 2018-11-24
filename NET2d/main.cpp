@@ -61,17 +61,7 @@ int main( void )
 
         double xpos, ypos;
         glfwGetCursorPos( window, &xpos, &ypos);
-//        vector <double> tmppos;
-//        tmppos.push_back(xpos);
-//        tmppos.push_back(ypos);
-//        postions.push_back(tmppos);
-//        std::cout << tmppos[0] << " : " << tmppos[1] << std::endl;
-//
-        
-        
-        // Draw the guiding curve
-//        drawPoint(xpos, ypos);
-        
+
         // Draw Buggy Freehand sketch lol
         freeHandSketch(postions);
         
@@ -102,7 +92,6 @@ void drawPoint(double xpos, double ypos){
 
 void freeHandSketch(vector<vector<double>> positions){
     glEnable( GL_POINT_SMOOTH );
-//    glBegin( GL );
     glBegin(GL_POINTS);
     glPointSize( 5 );
     glBegin( GL_POINT );
@@ -137,18 +126,11 @@ void cursorEnterCallback( GLFWwindow *window, int entered )
 
 void mouseButtonCallback( GLFWwindow *window, int button, int action, int mods )
 {
-//    if ( button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS ) {
-//        std::cout << "Right button pressed" << std::endl;
-//    }
-//
-    // Hold and drag logic
-//     if ( button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS ) {
-//         cout << "That is the actual fuck";
-//     }
+
 }
 
 void scrollCallback( GLFWwindow *window, double xoffset, double yoffset )
 {
     std::cout << xoffset << " : " << yoffset << std::endl;
-    
+
 }
