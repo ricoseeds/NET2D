@@ -11,6 +11,8 @@
 		1219058A21A54E3700AA12FB /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1219058921A54E3700AA12FB /* OpenGL.framework */; };
 		1219058C21A54F1500AA12FB /* libGLEW.2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1219058B21A54F1500AA12FB /* libGLEW.2.1.0.dylib */; };
 		1219058E21A54F6100AA12FB /* libglfw.3.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1219058D21A54F6000AA12FB /* libglfw.3.2.dylib */; };
+		12D2061321A5886600857835 /* resources in CopyFiles */ = {isa = PBXBuildFile; fileRef = 12D2061221A5885A00857835 /* resources */; };
+		12D2061621A7DEE900857835 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12D2061521A7DEE900857835 /* GLUT.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,6 +25,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		1219059521A583FF00AA12FB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				12D2061321A5886600857835 /* resources in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +44,9 @@
 		1219058B21A54F1500AA12FB /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 		1219058D21A54F6000AA12FB /* libglfw.3.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.2.dylib; path = ../../../../usr/local/Cellar/glfw/3.2.1/lib/libglfw.3.2.dylib; sourceTree = "<group>"; };
 		1219058F21A5601100AA12FB /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
+		1219059321A57ED100AA12FB /* Shader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
+		12D2061221A5885A00857835 /* resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = resources; sourceTree = "<group>"; };
+		12D2061521A7DEE900857835 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12D2061621A7DEE900857835 /* GLUT.framework in Frameworks */,
 				1219058E21A54F6100AA12FB /* libglfw.3.2.dylib in Frameworks */,
 				1219058C21A54F1500AA12FB /* libGLEW.2.1.0.dylib in Frameworks */,
 				1219058A21A54E3700AA12FB /* OpenGL.framework in Frameworks */,
@@ -68,8 +84,10 @@
 		1219058021A54B9000AA12FB /* NET2d */ = {
 			isa = PBXGroup;
 			children = (
+				1219059321A57ED100AA12FB /* Shader.h */,
 				1219058121A54B9000AA12FB /* main.cpp */,
 				1219058F21A5601100AA12FB /* Readme.md */,
+				12D2061221A5885A00857835 /* resources */,
 			);
 			path = NET2d;
 			sourceTree = "<group>";
@@ -77,6 +95,7 @@
 		1219058821A54E3700AA12FB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				12D2061521A7DEE900857835 /* GLUT.framework */,
 				1219058D21A54F6000AA12FB /* libglfw.3.2.dylib */,
 				1219058B21A54F1500AA12FB /* libGLEW.2.1.0.dylib */,
 				1219058921A54E3700AA12FB /* OpenGL.framework */,
@@ -94,6 +113,7 @@
 				1219057A21A54B9000AA12FB /* Sources */,
 				1219057B21A54B9000AA12FB /* Frameworks */,
 				1219057C21A54B9000AA12FB /* CopyFiles */,
+				1219059521A583FF00AA12FB /* CopyFiles */,
 			);
 			buildRules = (
 			);

@@ -1,175 +1,153 @@
-#include <iostream>
-
-// GLEW
-#define GLEW_STATIC
 #include <GL/glew.h>
-
-// GLFW
 #include <GLFW/glfw3.h>
+#include <iostream>
+#include <vector>
 
-// Window dimensions
-const GLuint WIDTH = 800, HEIGHT = 600;
+using namespace std;
 
-// Shaders
-const GLchar *vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 position;\n"
-"void main()\n"
-"{\n"
-"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-"}\0";
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 
-const GLchar *fragmentShaderSource = "#version 330 core\n"
-"out vec4 color;\n"
-"void main()\n"
-"{\n"
-"color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0";
+static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos );
+void cursorEnterCallback( GLFWwindow *window, int entered );
+void mouseButtonCallback( GLFWwindow *window, int button, int action, int mods );
+void scrollCallback( GLFWwindow *window, double xoffset, double yoffset );
 
-// The MAIN function, from here we start the application and run the game loop
-int main()
+
+int main( void )
 {
-    // Init GLFW
-    glfwInit();
+    GLFWwindow *window;
     
-    // Set all the required options for GLFW
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    
-    // Create a GLFWwindow object that we can use for GLFW's functions
-    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "NET2D", nullptr, nullptr);
-    
-    int screenWidth, screenHeight;
-    glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
-    
-    if (nullptr == window)
+    // Initialize the library
+    if ( !glfwInit( ) )
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
+        return -1;
+    }
+    
+    // Create a windowed mode window and its OpenGL context
+    window = glfwCreateWindow( SCREEN_WIDTH, SCREEN_HEIGHT, "NET2d", NULL, NULL );
+    
+    if ( !window )
+    {
+        glfwTerminate( );
+        return -1;
+    }
+    
+    // Make the window's context current
+    glfwMakeContextCurrent( window );
+    //
+    glfwSetCursorPosCallback( window, cursorPositionCallback );
+    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+    
+    glfwSetCursorEnterCallback( window, cursorEnterCallback );
+    
+    glfwSetMouseButtonCallback( window, mouseButtonCallback );
+    glfwSetInputMode( window, GLFW_STICKY_MOUSE_BUTTONS, 1 );
+    
+    glfwSetScrollCallback( window, scrollCallback );
+    //
+    
+    glViewport( 0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT ); // specifies the part of the window to which OpenGL will draw (in pixels), convert from normalised to pixels
+    glMatrixMode( GL_PROJECTION ); // projection matrix defines the properties of the camera that views the objects in the world coordinate frame. Here you typically set the zoom factor, aspect ratio and the near and far clipping planes
+    glLoadIdentity( ); // replace the current matrix with the identity matrix and starts us a fresh because matrix transforms such as glOrpho and glRotate cumulate, basically puts us at (0, 0, 0)
+    glOrtho( 0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, 0, 1 ); // essentially set coordinate system
+    glMatrixMode( GL_MODELVIEW ); // (default matrix mode) modelview matrix defines how your objects are transformed (meaning translation, rotation and scaling) in your world
+    //glLoadIdentity( ); // same as above comment
+    
+//    GLfloat pointVertex[] = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
+//    GLfloat pointVertex2[] = {};
+    vector<vector<double>> postions;
+    // Loop until the user closes the window
+    while ( !glfwWindowShouldClose( window ) )
+    {
+        glClear( GL_COLOR_BUFFER_BIT );
         
-        return EXIT_FAILURE;
-    }
-    
-    glfwMakeContextCurrent(window);
-    
-    // Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
-    glewExperimental = GL_TRUE;
-    // Initialize GLEW to setup the OpenGL Function pointers
-    if (GLEW_OK != glewInit())
-    {
-        std::cout << "Failed to initialize GLEW" << std::endl;
-        return EXIT_FAILURE;
-    }
-    
-    // Define the viewport dimensions
-    glViewport(0, 0, screenWidth, screenHeight);
-    
-    // Build and compile our shader program
-    // Vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    
-    // Check for compile time errors
-    GLint success;
-    GLchar infoLog[512];
-    
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-        << infoLog << std::endl;
-    }
-    
-    // Fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    
-    // Check for compile time errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-        << infoLog << std::endl;
-    }
-    
-    // Link shaders
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    
-    // Check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-        << infoLog << std::endl;
-    }
-    
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    
-    // Set up vertex data (and buffer(s)) and attribute pointers
-    GLfloat vertices[] =
-    {
-        -0.5f, -0.5f, 0.0f, // Left
-        0.5f, -0.5f, 0.0f,  // Right
-        0.0f, 0.5f, 0.0f    // Top
-    };
-    
-    GLuint VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-    glBindVertexArray(VAO);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
-    glEnableVertexAttribArray(0);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-    
-    glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
-    
-    // Game loop
-    while (!glfwWindowShouldClose(window))
-    {
-        // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
-        glfwPollEvents();
+        // Render OpenGL here
+        //glEnable( GL_POINT_SMOOTH ); // make the point circular
+        //glEnableClientState( GL_VERTEX_ARRAY ); // tell OpenGL that you're using a vertex array for fixed-function attribute
+//        glPointSize( 5 ); // must be added before glDrawArrays is called
+//        glVertexPointer( 2, GL_FLOAT, 0, pointVertex ); // point to the vertices to be used
+//        glDrawArrays( GL_POINTS, 0, 1 ); // draw the vertixes
+//        glDisableClientState( GL_VERTEX_ARRAY ); // tell OpenGL that you're finished using the vertex arrayattribute
+//        glDisable( GL_POINT_SMOOTH ); // stop the smoothing to make the points circular
+//
+        double xpos, ypos;
+        glfwGetCursorPos( window, &xpos, &ypos);
         
-        // Render
-        // Clear the colorbuffer
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        vector <double> tmppos;
+        tmppos.push_back(xpos);
+        tmppos.push_back(ypos);
+        postions.push_back(tmppos);
         
-        // Draw our first triangle
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindVertexArray(0);
+        std::cout << tmppos[0] << " : " << tmppos[1] << std::endl;
+        glEnable( GL_POINT_SMOOTH );
+        //glEnableClientState( GL_VERTEX_ARRAY );
+//        glVertexPointer(<#GLint size#>, <#GLenum type#>, <#GLsizei stride#>, <#const void *pointer#>)
+//        glDrawArrays(<#GLenum mode#>, <#GLint first#>, <#GLsizei count#>)
+        //glVertexPointer(2, GL_FLOAT, 0, pointVertex2);
         
-        // Swap the screen buffers
-        glfwSwapBuffers(window);
+        
+        glPointSize( 5 );
+        
+        glBegin(GL_POINTS);
+        glColor4f(1,1,1,1);
+        glVertex2f((GLfloat)xpos,(GLfloat) ( -ypos + SCREEN_HEIGHT));
+        glEnd();
+        
+        glBegin( GL_LINE_STRIP );
+        glColor3ub( 255, 0, 0 );
+        for( size_t i = 0; i < postions.size(); i += 2 )
+        {
+            glVertex2f( (GLfloat)postions[i][0], (GLfloat)postions[i][1]);
+        }
+        glEnd();
+        // glVertex3f(<#GLfloat x#>, <#GLfloat y#>, <#GLfloat z#>)
+        //glDrawArrays(GL_POINTS, 0, 2);
+        //glDisableClientState( GL_VERTEX_ARRAY );
+//        glEnableClientState( GL_VERTEX_ARRAY ); // tell OpenGL that you're using a vertex array for fixed-function attribute
+//        glVertexPointer( 2, GL_FLOAT, 0, pointVertex2 ); // point to the vertices to be used
+//        glPointSize( 10 ); // must be added before glDrawArrays is called
+//        glDrawArrays( GL_POINTS, 0, 1 ); // draw the vertixes
+//        glDisableClientState( GL_VERTEX_ARRAY ); // tell OpenGL that you're finished using the vertex arrayattribute
+//
+//        // Swap front and back buffers
+        glfwSwapBuffers( window );
+        
+        // Poll for and process events
+        glfwPollEvents( );
     }
     
-    // Properly de-allocate all resources once they've outlived their purpose
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glfwTerminate( );
     
-    // Terminate GLFW, clearing any resources allocated by GLFW.
-    glfwTerminate();
-    
-    return EXIT_SUCCESS;
+    return 0;
+}
+
+static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos )
+{
+    //std::cout << xpos << " : " << ypos << std::endl;
+}
+
+void cursorEnterCallback( GLFWwindow *window, int entered )
+{
+    if ( entered )
+    {
+        std::cout << "Entered Window" << std::endl;
+    }
+    else
+    {
+        std::cout << "Left window" << std::endl;
+    }
+}
+
+void mouseButtonCallback( GLFWwindow *window, int button, int action, int mods )
+{
+    if ( button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS )
+    {
+        std::cout << "Right button pressed" << std::endl;
+    }
+}
+
+void scrollCallback( GLFWwindow *window, double xoffset, double yoffset )
+{
+    std::cout << xoffset << " : " << yoffset << std::endl;
 }
