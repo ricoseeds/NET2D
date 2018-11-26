@@ -7,7 +7,9 @@ using namespace std;
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
-vector<vector<double>> postions;
+
+vector<vector<vector<double>>> all_positions;
+vector<vector<double>> positions;
 static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos );
 
 void cursorEnterCallback( GLFWwindow *window, int entered );
@@ -54,7 +56,6 @@ int main( void )
     glMatrixMode( GL_MODELVIEW ); // (default matrix mode) modelview matrix defines how your objects are transformed (meaning translation, rotation and scaling) in your world
     
     // Loop until the user closes the window
-    
     while ( !glfwWindowShouldClose( window ) )
     {
         glClear( GL_COLOR_BUFFER_BIT );
@@ -63,7 +64,10 @@ int main( void )
         glfwGetCursorPos( window, &xpos, &ypos);
 
         // Draw Buggy Freehand sketch lol
-        freeHandSketch(postions);
+        freeHandSketch(positions);
+        for( size_t i = 0; i < all_positions.size(); i += 1 ) {
+            freeHandSketch(all_positions[i]);
+        }
         
         // Swap front and back buffers
         glfwSwapBuffers( window );
@@ -92,7 +96,8 @@ void drawPoint(double xpos, double ypos){
 
 void freeHandSketch(vector<vector<double>> positions){
     glEnable( GL_POINT_SMOOTH );
-    glBegin(GL_POINTS);
+//    glBegin(GL_POINTS);
+    glBegin(GL_LINE_STRIP);
     glPointSize( 5 );
     glBegin( GL_POINT );
     glColor3ub( 255, 0, 0 );
@@ -106,12 +111,15 @@ static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos
 {
     std::cout << xpos << " : " << ypos << std::endl;
     // drag positions
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-    {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         vector <double> tmppos;
         tmppos.push_back(xpos);
         tmppos.push_back(ypos);
-        postions.push_back(tmppos);
+        positions.push_back(tmppos);
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+            all_positions.push_back(positions);
+            positions.clear();
+        }
     }
 }
 
