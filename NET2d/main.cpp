@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+//#include <CGAL/Simple_cartesian.h>
 
 using namespace std;
 
@@ -18,6 +19,8 @@ void scrollCallback( GLFWwindow *window, double xoffset, double yoffset );
 GLfloat adjustY(double);// y coordinate adjustment
 void freeHandSketch(vector<vector<double>> positions);
 void drawPoint(double xpos, double ypos);
+vector<vector<double>> getGuidingCurve();
+void renderGuidingCurve(vector<vector<double>>);
 
 int main( void )
 {
@@ -54,16 +57,17 @@ int main( void )
     glLoadIdentity(); // replace the current matrix with the identity matrix and starts us a fresh because matrix transforms such as glOrpho and glRotate cumulate, basically puts us at (0, 0, 0)
     glOrtho( 0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, 0, 1 ); // essentially set coordinate system
     glMatrixMode( GL_MODELVIEW ); // (default matrix mode) modelview matrix defines how your objects are transformed (meaning translation, rotation and scaling) in your world
-    
+    vector<vector<double>> guiding_curve = getGuidingCurve();
     // Loop until the user closes the window
+    double xpos, ypos;
     while ( !glfwWindowShouldClose( window ) )
     {
         glClear( GL_COLOR_BUFFER_BIT );
-
-        double xpos, ypos;
         glfwGetCursorPos( window, &xpos, &ypos);
 
-        // Draw Buggy Freehand sketch lol
+        // Render the guiding curve
+        renderGuidingCurve(guiding_curve);
+        // Draw freehand
         freeHandSketch(positions);
         for( size_t i = 0; i < all_positions.size(); i += 1 ) {
             freeHandSketch(all_positions[i]);
@@ -75,9 +79,7 @@ int main( void )
         // Poll for and process events
         glfwPollEvents( );
     }
-    
     glfwTerminate( );
-    
     return 0;
 }
 
@@ -107,9 +109,24 @@ void freeHandSketch(vector<vector<double>> positions){
     glEnd();
 }
 
+//Render guiding curve
+void renderGuidingCurve(vector<vector<double>> curve){
+    glEnable( GL_POINT_SMOOTH );
+    //    glBegin(GL_POINTS);
+    glBegin(GL_LINE_STRIP);
+    glPointSize( 10 );
+    glBegin( GL_POINT );
+    glColor3ub( 0, 255, 0 );
+    for( size_t i = 0; i < curve.size(); i += 1 ) {
+        glVertex2f( (GLfloat)(curve[i][0] * 10), adjustY((curve[i][1] * 10)));
+    }
+    glEnd();
+}
+
+
 static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos )
 {
-    std::cout << xpos << " : " << ypos << std::endl;
+//    std::cout << xpos << " : " << ypos << std::endl;
     // drag positions
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         vector <double> tmppos;
@@ -122,6 +139,29 @@ static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos
         }
     }
 }
+
+vector<vector<double>> getGuidingCurve(){
+    vector<vector<double>> guiding_c;
+    const int n = 7;
+    double points[n][2] = {
+        {10.0, 10.0},
+        {15.0, 20.0},
+        {20.0, 20.0},
+        {25.0, 10.0},
+        {30.0, 5.0},
+        {35.0, 5.0},
+        {40.0, 10.0}
+    };
+    for (size_t i = 0; i < n; i++) {
+        vector<double> each_point;
+        for (size_t j = 0; j < 2; j++) {
+            each_point.push_back(points[i][j]);
+        }
+        guiding_c.push_back(each_point);
+    }
+    return guiding_c;
+}
+// Callback functions
 
 void cursorEnterCallback( GLFWwindow *window, int entered )
 {
