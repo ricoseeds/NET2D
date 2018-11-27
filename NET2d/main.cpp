@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+#include <math.h>
+
 //#include <CGAL/Simple_cartesian.h>
 
 using namespace std;
@@ -21,6 +23,7 @@ void freeHandSketch(vector<vector<double>> positions);
 void drawPoint(double xpos, double ypos);
 vector<vector<double>> getGuidingCurve();
 void renderGuidingCurve(vector<vector<double>>);
+float calculateDistanceOfPointFromStraightLine(float, float, float, float, float);
 
 int main( void )
 {
@@ -100,7 +103,8 @@ void freeHandSketch(vector<vector<double>> positions){
     glEnable( GL_POINT_SMOOTH );
 //    glBegin(GL_POINTS);
     glBegin(GL_LINE_STRIP);
-    glPointSize( 5 );
+//    glPointSize( 50 );
+//    glLineWidth(10);
     glBegin( GL_POINT );
     glColor3ub( 255, 0, 0 );
     for( size_t i = 0; i < positions.size(); i += 1 ) {
@@ -112,10 +116,10 @@ void freeHandSketch(vector<vector<double>> positions){
 //Render guiding curve
 void renderGuidingCurve(vector<vector<double>> curve){
     glEnable( GL_POINT_SMOOTH );
-    //    glBegin(GL_POINTS);
     glBegin(GL_LINE_STRIP);
-    glPointSize( 10 );
-    glBegin( GL_POINT );
+//    glBegin(GL_POINTS);
+//    glBegin( GL_POINT );
+//    glPointSize( 100 );
     glColor3ub( 0, 255, 0 );
     for( size_t i = 0; i < curve.size(); i += 1 ) {
         glVertex2f( (GLfloat)(curve[i][0] * 10), adjustY((curve[i][1] * 10)));
@@ -126,7 +130,7 @@ void renderGuidingCurve(vector<vector<double>> curve){
 
 static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos )
 {
-//    std::cout << xpos << " : " << ypos << std::endl;
+    std::cout << xpos << " : " << ypos << std::endl;
     // drag positions
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         vector <double> tmppos;
@@ -161,8 +165,13 @@ vector<vector<double>> getGuidingCurve(){
     }
     return guiding_c;
 }
-// Callback functions
 
+float calculateDistanceOfPointFromStraightLine(float a, float b, float c, float x0, float y0){ // Takes ax + by + c = 0 and (x0, y0)
+    // Calculates the distance of a point from a given straight line
+    return (float)(a * x0 + b * y0 + c) / sqrt(a * a + b * b);
+}
+
+// Callback functions
 void cursorEnterCallback( GLFWwindow *window, int entered )
 {
     if ( entered ) {
@@ -180,5 +189,4 @@ void mouseButtonCallback( GLFWwindow *window, int button, int action, int mods )
 void scrollCallback( GLFWwindow *window, double xoffset, double yoffset )
 {
     std::cout << xoffset << " : " << yoffset << std::endl;
-
 }
