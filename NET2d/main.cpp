@@ -4,6 +4,11 @@
 #include <vector>
 #include <math.h>
 
+//glm working
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/vec2.hpp>
+//#include <glm/gtc/type_ptr.hpp>
+//
 //#include <CGAL/Simple_cartesian.h>
 
 using namespace std;
@@ -24,6 +29,8 @@ void drawPoint(double xpos, double ypos);
 vector<vector<double>> getGuidingCurve();
 void renderGuidingCurve(vector<vector<double>>);
 float calculateDistanceOfPointFromStraightLine(float, float, float, float, float);
+void createGridVertical(int, int);
+void createGridHorizontal(int, int);
 
 int main( void )
 {
@@ -33,7 +40,6 @@ int main( void )
     {
         return -1;
     }
-    
     // Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow( SCREEN_WIDTH, SCREEN_HEIGHT, "NET2d", NULL, NULL );
     
@@ -70,6 +76,11 @@ int main( void )
 
         // Render the guiding curve
         renderGuidingCurve(guiding_curve);
+        
+        //Draw the grid
+        createGridVertical(SCREEN_WIDTH, SCREEN_HEIGHT);
+        createGridHorizontal(SCREEN_HEIGHT, SCREEN_WIDTH);
+        
         // Draw freehand
         freeHandSketch(positions);
         for( size_t i = 0; i < all_positions.size(); i += 1 ) {
@@ -144,6 +155,27 @@ static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos
     }
 }
 
+void createGridVertical(int cols, int widthInPixel){
+    for( size_t i = 0; i < cols; i += 10 ) {
+        glEnable( GL_POINT_SMOOTH );
+        glBegin(GL_LINE_STRIP);
+        glColor3ub( 0, 0, 255 );
+        glVertex2f( (GLfloat) i, adjustY(0.0));
+        glVertex2f( (GLfloat) i, adjustY(widthInPixel));
+        glEnd();
+    }
+}
+
+void createGridHorizontal(int rows, int widthInPixel){
+    for( size_t i = 0; i < rows; i += 10 ) {
+        glEnable( GL_POINT_SMOOTH );
+        glBegin(GL_LINE_STRIP);
+        glColor3ub( 0, 0, 255 );
+        glVertex2f( (GLfloat) 0.0, adjustY(i));
+        glVertex2f( (GLfloat) widthInPixel, adjustY(i));
+        glEnd();
+    }
+}
 vector<vector<double>> getGuidingCurve(){
     vector<vector<double>> guiding_c;
     const int n = 7;
@@ -170,6 +202,8 @@ float calculateDistanceOfPointFromStraightLine(float a, float b, float c, float 
     // Calculates the distance of a point from a given straight line
     return (float)(a * x0 + b * y0 + c) / sqrt(a * a + b * b);
 }
+
+
 
 // Callback functions
 void cursorEnterCallback( GLFWwindow *window, int entered )
