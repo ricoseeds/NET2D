@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <cmath>
 
 //glm working
 //#include <glm/gtc/matrix_transform.hpp>
@@ -80,7 +81,7 @@ int main( void )
         //Draw the grid
         createGridVertical(SCREEN_WIDTH, SCREEN_HEIGHT);
         createGridHorizontal(SCREEN_HEIGHT, SCREEN_WIDTH);
-        
+//
         // Draw freehand
         freeHandSketch(positions);
         for( size_t i = 0; i < all_positions.size(); i += 1 ) {
@@ -117,8 +118,9 @@ void freeHandSketch(vector<vector<double>> positions){
 //    glPointSize( 50 );
 //    glLineWidth(10);
     glBegin( GL_POINT );
-    glColor3ub( 255, 0, 0 );
+//    glColor3ub( 255, 0, 0 );
     for( size_t i = 0; i < positions.size(); i += 1 ) {
+        glColor3ub( (int) positions[i][2], 0, 0);
         glVertex2f( (GLfloat)positions[i][0], adjustY(positions[i][1]));
     }
     glEnd();
@@ -147,6 +149,9 @@ static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos
         vector <double> tmppos;
         tmppos.push_back(xpos);
         tmppos.push_back(ypos);
+//        tmppos.push_back( rand() % 150 + 255);
+        tmppos.push_back(255 * exp(-xpos / 200));
+//        tmppos.push_back(255/ (xpos + 1));
         positions.push_back(tmppos);
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
             all_positions.push_back(positions);
@@ -159,7 +164,7 @@ void createGridVertical(int cols, int widthInPixel){
     for( size_t i = 0; i < cols; i += 10 ) {
         glEnable( GL_POINT_SMOOTH );
         glBegin(GL_LINE_STRIP);
-        glColor3ub( 0, 0, 255 );
+        glColor3ub( 0, 0, 100 );
         glVertex2f( (GLfloat) i, adjustY(0.0));
         glVertex2f( (GLfloat) i, adjustY(widthInPixel));
         glEnd();
@@ -170,7 +175,7 @@ void createGridHorizontal(int rows, int widthInPixel){
     for( size_t i = 0; i < rows; i += 10 ) {
         glEnable( GL_POINT_SMOOTH );
         glBegin(GL_LINE_STRIP);
-        glColor3ub( 0, 0, 255 );
+        glColor3ub( 0, 0, 100 );
         glVertex2f( (GLfloat) 0.0, adjustY(i));
         glVertex2f( (GLfloat) widthInPixel, adjustY(i));
         glEnd();
