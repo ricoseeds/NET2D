@@ -11,6 +11,8 @@
 		1219058A21A54E3700AA12FB /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1219058921A54E3700AA12FB /* OpenGL.framework */; };
 		1219058C21A54F1500AA12FB /* libGLEW.2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1219058B21A54F1500AA12FB /* libGLEW.2.1.0.dylib */; };
 		1219058E21A54F6100AA12FB /* libglfw.3.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1219058D21A54F6000AA12FB /* libglfw.3.2.dylib */; };
+		125D435921F341AC006A4D09 /* Vect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 125D435821F341AC006A4D09 /* Vect.cpp */; };
+		125D435F21F48F3D006A4D09 /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 125D435D21F48F3D006A4D09 /* Color.cpp */; };
 		12D2061621A7DEE900857835 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12D2061521A7DEE900857835 /* GLUT.framework */; };
 /* End PBXBuildFile section */
 
@@ -42,7 +44,15 @@
 		1219058B21A54F1500AA12FB /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 		1219058D21A54F6000AA12FB /* libglfw.3.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.2.dylib; path = ../../../../usr/local/Cellar/glfw/3.2.1/lib/libglfw.3.2.dylib; sourceTree = "<group>"; };
 		1219058F21A5601100AA12FB /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
+		123D713A21F5ADA50050E0FD /* MySphere.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MySphere.h; sourceTree = "<group>"; };
 		124A70E321B1452500F7C13A /* glm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = glm; sourceTree = SOURCE_ROOT; };
+		125D435521F32A5E006A4D09 /* Vect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vect.h; sourceTree = "<group>"; };
+		125D435621F32A8F006A4D09 /* Ray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Ray.h; sourceTree = "<group>"; };
+		125D435721F33C6A006A4D09 /* Camera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
+		125D435821F341AC006A4D09 /* Vect.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Vect.cpp; sourceTree = "<group>"; };
+		125D435D21F48F3D006A4D09 /* Color.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Color.cpp; sourceTree = "<group>"; };
+		125D435E21F48F3D006A4D09 /* Color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
+		125D436121F4953A006A4D09 /* MyLight.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyLight.h; sourceTree = "<group>"; };
 		12D2061521A7DEE900857835 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -84,6 +94,14 @@
 				124A70E321B1452500F7C13A /* glm */,
 				1219058121A54B9000AA12FB /* main.cpp */,
 				1219058F21A5601100AA12FB /* Readme.md */,
+				125D435521F32A5E006A4D09 /* Vect.h */,
+				125D435821F341AC006A4D09 /* Vect.cpp */,
+				125D435621F32A8F006A4D09 /* Ray.h */,
+				125D435721F33C6A006A4D09 /* Camera.h */,
+				125D435D21F48F3D006A4D09 /* Color.cpp */,
+				125D435E21F48F3D006A4D09 /* Color.h */,
+				125D436121F4953A006A4D09 /* MyLight.h */,
+				123D713A21F5ADA50050E0FD /* MySphere.h */,
 			);
 			path = NET2d;
 			sourceTree = "<group>";
@@ -157,6 +175,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1219058221A54B9000AA12FB /* main.cpp in Sources */,
+				125D435F21F48F3D006A4D09 /* Color.cpp in Sources */,
+				125D435921F341AC006A4D09 /* Vect.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

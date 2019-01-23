@@ -1,231 +1,123 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
 #include <vector>
-#include <math.h>
 #include <cmath>
+#include <limits>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 
-//glm working
-//#include <glm/gtc/matrix_transform.hpp>
-//#include <glm/vec2.hpp>
-//#include <glm/gtc/type_ptr.hpp>
-//
-//#include <CGAL/Simple_cartesian.h>
+#include "Vect.h"
+#include "Camera.h"
+#include "Color.h"
+#include "MyLight.h"
+#include "MySphere.h"
 
 using namespace std;
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+#define DPI 72
 
-vector<vector<vector<double>>> all_positions;
-vector<vector<double>> positions;
-static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos );
+struct RGBType{
+    double r;
+    double g;
+    double b;
+};
 
-void cursorEnterCallback( GLFWwindow *window, int entered );
-void mouseButtonCallback( GLFWwindow *window, int button, int action, int mods );
-void scrollCallback( GLFWwindow *window, double xoffset, double yoffset );
-GLfloat adjustY(double);// y coordinate adjustment
-void freeHandSketch(vector<vector<double>> positions);
-void drawPoint(double xpos, double ypos);
-vector<vector<double>> getGuidingCurve();
-void renderGuidingCurve(vector<vector<double>>);
-float calculateDistanceOfPointFromStraightLine(float, float, float, float, float);
-void createGridVertical(int, int);
-void createGridHorizontal(int, int);
-
-int main( void )
-{
-    GLFWwindow *window;
-    // Initialize the library
-    if ( !glfwInit( ) )
-    {
-        return -1;
-    }
-    // Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow( SCREEN_WIDTH, SCREEN_HEIGHT, "NET2d", NULL, NULL );
+void save_image(const char *filename, int w, int h, int dpi, RGBType *data){
+    FILE *f;
+    int k = w * h;
+    int s = 4 * k;
+    int filesize = 54 + s;
+    double factor = 39.375;
+    int m = static_cast<int>(factor);
+    int ppm = dpi * m;
+    unsigned char bmpfileheader[14] = {'B', 'M', 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0};
+    unsigned char bmpinfoheader[40] = {40, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 1, 0, 24, 0};
+    bmpfileheader[2] = (unsigned char) (filesize);
+    bmpfileheader[3] = (unsigned char) (filesize >> 8);
+    bmpfileheader[4] = (unsigned char) (filesize >> 16);
+    bmpfileheader[5] = (unsigned char) (filesize >> 24);
     
-    if ( !window )
-    {
-        glfwTerminate( );
-        return -1;
-    }
+    bmpinfoheader[4] = (unsigned char)(w);
+    bmpinfoheader[5] = (unsigned char)(w >> 8);
+    bmpinfoheader[6] = (unsigned char)(w >> 16);
+    bmpinfoheader[7] = (unsigned char)(w >> 24);
     
-    // Make the window's context current
-    glfwMakeContextCurrent( window );
+    bmpinfoheader[8] = (unsigned char)(h);
+    bmpinfoheader[9] = (unsigned char)(h >> 8);
+    bmpinfoheader[10] = (unsigned char)(h >> 16);
+    bmpinfoheader[11] = (unsigned char)(h >> 24);
     
-    // Setup callbacks
-    glfwSetCursorPosCallback( window, cursorPositionCallback );
-    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
-    glfwSetCursorEnterCallback( window, cursorEnterCallback );
-    glfwSetMouseButtonCallback( window, mouseButtonCallback );
-    glfwSetInputMode( window, GLFW_STICKY_MOUSE_BUTTONS, 1 );
-    glfwSetScrollCallback( window, scrollCallback );
-
-    // OpenGL specifics
-    glViewport( 0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT ); // specifies the part of the window to which OpenGL will draw (in pixels), convert from normalised to pixels
-    glMatrixMode( GL_PROJECTION ); // projection matrix defines the properties of the camera that views the objects in the world coordinate frame. Here you typically set the zoom factor, aspect ratio and the near and far clipping planes
-    glLoadIdentity(); // replace the current matrix with the identity matrix and starts us a fresh because matrix transforms such as glOrpho and glRotate cumulate, basically puts us at (0, 0, 0)
-    glOrtho( 0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, 0, 1 ); // essentially set coordinate system
-    glMatrixMode( GL_MODELVIEW ); // (default matrix mode) modelview matrix defines how your objects are transformed (meaning translation, rotation and scaling) in your world
-    vector<vector<double>> guiding_curve = getGuidingCurve();
-    // Loop until the user closes the window
-    double xpos, ypos;
-    while ( !glfwWindowShouldClose( window ) )
-    {
-        glClear( GL_COLOR_BUFFER_BIT );
-        glfwGetCursorPos( window, &xpos, &ypos);
-
-        // Render the guiding curve
-        renderGuidingCurve(guiding_curve);
-        
-        //Draw the grid
-        createGridVertical(SCREEN_WIDTH, SCREEN_HEIGHT);
-        createGridHorizontal(SCREEN_HEIGHT, SCREEN_WIDTH);
-//
-        // Draw freehand
-        freeHandSketch(positions);
-        for( size_t i = 0; i < all_positions.size(); i += 1 ) {
-            freeHandSketch(all_positions[i]);
-        }
-        
-        // Swap front and back buffers
-        glfwSwapBuffers( window );
+    bmpinfoheader[21] = (unsigned char)(s);
+    bmpinfoheader[22] = (unsigned char)(s >> 8);
+    bmpinfoheader[23] = (unsigned char)(s >> 16);
+    bmpinfoheader[24] = (unsigned char)(s >> 24);
     
-        // Poll for and process events
-        glfwPollEvents( );
+    bmpinfoheader[25] = (unsigned char)(ppm);
+    bmpinfoheader[26] = (unsigned char)(ppm >> 8);
+    bmpinfoheader[27] = (unsigned char)(ppm >> 16);
+    bmpinfoheader[28] = (unsigned char)(ppm >> 24);
+    
+    bmpinfoheader[29] = (unsigned char)(ppm);
+    bmpinfoheader[30] = (unsigned char)(ppm >> 8);
+    bmpinfoheader[31] = (unsigned char)(ppm >> 16);
+    bmpinfoheader[32] = (unsigned char)(ppm >> 24);
+    
+    f = fopen(filename, "wb");
+    fwrite(bmpfileheader, 1, 14, f);
+    fwrite(bmpinfoheader, 1, 40, f);
+    
+    for(int i = 0; i < k; i++){
+//        RGBType rgb = data[i];
+        double red = (data[i].r) * 255;
+        double green = (data[i].g) * 255;
+        double blue = (data[i].b) * 255;
+        unsigned char color[3] = {static_cast<unsigned char>((int)floor(blue)), static_cast<unsigned char>((int)floor(green)), static_cast<unsigned char>((int)floor(red))};
+        fwrite(color, 1, 3, f);
     }
-    glfwTerminate( );
-    return 0;
+    fclose(f);
+    
 }
 
-GLfloat adjustY(double yVal){
-    return (GLfloat)(-yVal + SCREEN_HEIGHT);
-}
-
-void drawPoint(double xpos, double ypos){
-    glEnable( GL_POINT_SMOOTH );
-    glPointSize( 5 );
-    glBegin(GL_POINTS);
-    glColor3ub( 255, 0, 0 );
-    glVertex2f((GLfloat)xpos, adjustY(ypos));
-    glEnd();
-}
-
-void freeHandSketch(vector<vector<double>> positions){
-    glEnable( GL_POINT_SMOOTH );
-//    glBegin(GL_POINTS);
-    glBegin(GL_LINE_STRIP);
-//    glPointSize( 50 );
-//    glLineWidth(10);
-    glBegin( GL_POINT );
-//    glColor3ub( 255, 0, 0 );
-    for( size_t i = 0; i < positions.size(); i += 1 ) {
-        glColor3ub( (int) positions[i][2], 0, 0);
-        glVertex2f( (GLfloat)positions[i][0], adjustY(positions[i][1]));
-    }
-    glEnd();
-}
-
-//Render guiding curve
-void renderGuidingCurve(vector<vector<double>> curve){
-    glEnable( GL_POINT_SMOOTH );
-    glBegin(GL_LINE_STRIP);
-//    glBegin(GL_POINTS);
-//    glBegin( GL_POINT );
-//    glPointSize( 100 );
-    glColor3ub( 0, 255, 0 );
-    for( size_t i = 0; i < curve.size(); i += 1 ) {
-        glVertex2f( (GLfloat)(curve[i][0] * 10), adjustY((curve[i][1] * 10)));
-    }
-    glEnd();
-}
-
-
-static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos )
-{
-    std::cout << xpos << " : " << ypos << std::endl;
-    // drag positions
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        vector <double> tmppos;
-        tmppos.push_back(xpos);
-        tmppos.push_back(ypos);
-//        tmppos.push_back( rand() % 150 + 255);
-        tmppos.push_back(255 * exp(-xpos / 200));
-//        tmppos.push_back(255/ (xpos + 1));
-        positions.push_back(tmppos);
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
-            all_positions.push_back(positions);
-            positions.clear();
+int main(int argc, char *argv[]){
+    //cout << "Hello";
+    int n = SCREEN_WIDTH * SCREEN_HEIGHT;
+    RGBType *pixels = new RGBType[n];
+    Vect X(1, 0, 0);
+    Vect Y(0, 1, 0);
+    Vect Z(0, 0, 1);
+    
+    Vect campos(3, 1.5, -4);
+    // for the camera
+    Vect lookat(0, 0, 0);
+    Vect diff_btw(campos.getVectX() - lookat.getVectX(), campos.getVectY() - lookat.getVectY(), campos.getVectZ() - lookat.getVectZ());
+    Vect camDir = diff_btw.negative().normalize();
+    Vect camright = Y.crossProduct(camDir).normalize();
+    Vect camdown = camright.crossProduct(camDir);
+    Camera scene_cam(campos, camDir, camright, camdown);
+    
+    Color white_light(1.0, 1.0, 1.0, 0);
+    Color green_light(0.5, 1.0, 0.5, 0.3);
+    Color gray(0.5, 0.5, 0.5, 0);
+    Color black(0.0, 0.0, 0.0, 0);
+    
+    Vect light_pos(-7, 10, -10);
+    MyLight scene_light(light_pos, white_light);
+    
+    int index;
+    for (int x = 0; x < SCREEN_WIDTH; x++) {
+        for (int y = 0; y < SCREEN_HEIGHT; y++) {
+            index = (y * SCREEN_WIDTH) + x;
+            pixels[index].r = (double) 23 / 255.0;
+            pixels[index].g = (double) 222 / 255.0;
+            pixels[index].b = (double) 10 / 255.0;
         }
     }
+    save_image("/Users/arghachakraborty/Desktop/pinku.bmp", SCREEN_WIDTH, SCREEN_HEIGHT, DPI, pixels);
+    
 }
 
-void createGridVertical(int cols, int widthInPixel){
-    for( size_t i = 0; i < cols; i += 10 ) {
-        glEnable( GL_POINT_SMOOTH );
-        glBegin(GL_LINE_STRIP);
-        glColor3ub( 0, 0, 100 );
-        glVertex2f( (GLfloat) i, adjustY(0.0));
-        glVertex2f( (GLfloat) i, adjustY(widthInPixel));
-        glEnd();
-    }
-}
-
-void createGridHorizontal(int rows, int widthInPixel){
-    for( size_t i = 0; i < rows; i += 10 ) {
-        glEnable( GL_POINT_SMOOTH );
-        glBegin(GL_LINE_STRIP);
-        glColor3ub( 0, 0, 100 );
-        glVertex2f( (GLfloat) 0.0, adjustY(i));
-        glVertex2f( (GLfloat) widthInPixel, adjustY(i));
-        glEnd();
-    }
-}
-vector<vector<double>> getGuidingCurve(){
-    vector<vector<double>> guiding_c;
-    const int n = 7;
-    double points[n][2] = {
-        {10.0, 10.0},
-        {15.0, 20.0},
-        {20.0, 20.0},
-        {25.0, 10.0},
-        {30.0, 5.0},
-        {35.0, 5.0},
-        {40.0, 10.0}
-    };
-    for (size_t i = 0; i < n; i++) {
-        vector<double> each_point;
-        for (size_t j = 0; j < 2; j++) {
-            each_point.push_back(points[i][j]);
-        }
-        guiding_c.push_back(each_point);
-    }
-    return guiding_c;
-}
-
-float calculateDistanceOfPointFromStraightLine(float a, float b, float c, float x0, float y0){ // Takes ax + by + c = 0 and (x0, y0)
-    // Calculates the distance of a point from a given straight line
-    return (float)(a * x0 + b * y0 + c) / sqrt(a * a + b * b);
-}
-
-
-
-// Callback functions
-void cursorEnterCallback( GLFWwindow *window, int entered )
-{
-    if ( entered ) {
-        std::cout << "Entered Window" << std::endl;
-    } else {
-        std::cout << "Left window" << std::endl;
-    }
-}
-
-void mouseButtonCallback( GLFWwindow *window, int button, int action, int mods )
-{
-
-}
-
-void scrollCallback( GLFWwindow *window, double xoffset, double yoffset )
-{
-    std::cout << xoffset << " : " << yoffset << std::endl;
-}
