@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "Color.h"
 #include "MyLight.h"
+#include "MySceneObject.h"
 #include "MySphere.h"
 
 using namespace std;
@@ -87,6 +88,7 @@ int main(int argc, char *argv[]){
     //cout << "Hello";
     int n = SCREEN_WIDTH * SCREEN_HEIGHT;
     RGBType *pixels = new RGBType[n];
+    Vect origin(0, 0, 0);
     Vect X(1, 0, 0);
     Vect Y(0, 1, 0);
     Vect Z(0, 0, 1);
@@ -101,12 +103,15 @@ int main(int argc, char *argv[]){
     Camera scene_cam(campos, camDir, camright, camdown);
     
     Color white_light(1.0, 1.0, 1.0, 0);
-    Color green_light(0.5, 1.0, 0.5, 0.3);
+    Color green_color(0.5, 1.0, 0.5, 0.3);
     Color gray(0.5, 0.5, 0.5, 0);
     Color black(0.0, 0.0, 0.0, 0);
     
     Vect light_pos(-7, 10, -10);
     MyLight scene_light(light_pos, white_light);
+    
+    // Scene objects
+//    MySphere scene_sphere(origin, 1, green_color);
     
     int index;
     for (int x = 0; x < SCREEN_WIDTH; x++) {

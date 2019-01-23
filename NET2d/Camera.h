@@ -18,19 +18,19 @@ class Camera {
 public:
     Camera();
     Camera(Vect, Vect, Vect, Vect);
-    Vect getCameraPosition(){
+    const Vect getCameraPosition(){
         return campos;
     }
     
-    Vect getCameraDirection(){
+    const Vect getCameraDirection(){
         return camdir;
     }
     
-    Vect getCameraRight(){
+    const Vect getCameraRight(){
         return camright;
     }
     
-    Vect getCameraDown(){
+    const Vect getCameraDown(){
         return camdown;
     }
 };
@@ -48,11 +48,4 @@ Camera::Camera(Vect p, Vect d, Vect r, Vect dn){
     camright = r;
     camdown = d;
 }
-
-
-
-
-
-
-
 #endif /* Camera_h */

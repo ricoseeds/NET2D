@@ -9,17 +9,19 @@
 #ifndef My_Sphere_h
 #define My_Sphere_h
 
-#include <math.h>
+//#include <math.h>
+//#include "MySceneObject.h"
 #include "Vect.h"
 #include "Color.h"
+#include "MySceneObject.h"
 
-class Sphere {
+class MySphere : public MySceneObject{
     Vect center;
     double radius;
     Color color;
 public:
-    Sphere();
-    Sphere(Vect, double, Color);
+    MySphere();
+    MySphere(Vect, double, Color);
     Vect getSphereCenter(){
         return center;
     }
@@ -34,14 +36,14 @@ public:
     
 };
 
-Sphere::Sphere(){
+MySphere::MySphere(){
     center = Vect(0, 0, 0);
     radius = 1.0;
     color = Color(0.5, 0.5, 0.5, 0);
     
 }
 
-Sphere::Sphere(Vect p, double r, Color c){
+MySphere::MySphere(Vect p, double r, Color c){
     center = p;
     radius = r;
     color = c;
