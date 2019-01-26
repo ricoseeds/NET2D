@@ -17,18 +17,18 @@ using namespace std;
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
-vector<vector<vector<double>>> all_positions;
-vector<vector<double>> positions;
+vector<vector<vector<double> > > all_positions;
+vector<vector<double> > positions;
 static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos );
 
 void cursorEnterCallback( GLFWwindow *window, int entered );
 void mouseButtonCallback( GLFWwindow *window, int button, int action, int mods );
 void scrollCallback( GLFWwindow *window, double xoffset, double yoffset );
 GLfloat adjustY(double);// y coordinate adjustment
-void freeHandSketch(vector<vector<double>> positions);
+void freeHandSketch(vector<vector<double> > positions);
 void drawPoint(double xpos, double ypos);
-vector<vector<double>> getGuidingCurve();
-void renderGuidingCurve(vector<vector<double>>);
+vector<vector<double> > getGuidingCurve();
+void renderGuidingCurve(vector<vector<double> >);
 float calculateDistanceOfPointFromStraightLine(float, float, float, float, float);
 void createGridVertical(int, int);
 void createGridHorizontal(int, int);
@@ -67,7 +67,7 @@ int main( void )
     glLoadIdentity(); // replace the current matrix with the identity matrix and starts us a fresh because matrix transforms such as glOrpho and glRotate cumulate, basically puts us at (0, 0, 0)
     glOrtho( 0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, 0, 1 ); // essentially set coordinate system
     glMatrixMode( GL_MODELVIEW ); // (default matrix mode) modelview matrix defines how your objects are transformed (meaning translation, rotation and scaling) in your world
-    vector<vector<double>> guiding_curve = getGuidingCurve();
+    vector<vector<double> > guiding_curve = getGuidingCurve();
     // Loop until the user closes the window
     double xpos, ypos;
     while ( !glfwWindowShouldClose( window ) )
@@ -111,7 +111,7 @@ void drawPoint(double xpos, double ypos){
     glEnd();
 }
 
-void freeHandSketch(vector<vector<double>> positions){
+void freeHandSketch(vector<vector<double> > positions){
     glEnable( GL_POINT_SMOOTH );
 //    glBegin(GL_POINTS);
     glBegin(GL_LINE_STRIP);
@@ -127,7 +127,7 @@ void freeHandSketch(vector<vector<double>> positions){
 }
 
 //Render guiding curve
-void renderGuidingCurve(vector<vector<double>> curve){
+void renderGuidingCurve(vector<vector<double> > curve){
     glEnable( GL_POINT_SMOOTH );
     glBegin(GL_LINE_STRIP);
 //    glBegin(GL_POINTS);
@@ -181,8 +181,8 @@ void createGridHorizontal(int rows, int widthInPixel){
         glEnd();
     }
 }
-vector<vector<double>> getGuidingCurve(){
-    vector<vector<double>> guiding_c;
+vector<vector<double> > getGuidingCurve(){
+    vector<vector<double> > guiding_c;
     const int n = 7;
     double points[n][2] = {
         {10.0, 10.0},
