@@ -15,6 +15,7 @@
 #include "MyLight.h"
 #include "MySphere.h"
 
+
 using namespace std;
 
 #define SCREEN_WIDTH 640
@@ -117,7 +118,7 @@ int main(int argc, char *argv[]){
             pixels[index].b = (double) 10 / 255.0;
         }
     }
-    save_image("/Users/arghachakraborty/Desktop/pinku.bmp", SCREEN_WIDTH, SCREEN_HEIGHT, DPI, pixels);
+    save_image("/home/netra/NET2D/NET2d/fu.bmp", SCREEN_WIDTH, SCREEN_HEIGHT, DPI, pixels);
     
 }
 

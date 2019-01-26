@@ -6,8 +6,8 @@
 //  Copyright © 2019 Argha Chakraborty. All rights reserved.
 //
 
-#ifndef Camera_h
-#define Camera_h
+#ifndef CAMERA_H
+#define CAMERA_H
 
 #include "Vect.h"
 

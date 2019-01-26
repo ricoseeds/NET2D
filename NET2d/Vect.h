@@ -6,8 +6,8 @@
 //  Copyright © 2019 Argha Chakraborty. All rights reserved.
 //
 
-#ifndef Vect_h
-#define Vect_h
+#ifndef VECT_H
+#define VECT_H
 
 #include "math.h"
 
