@@ -30,6 +30,7 @@ struct RGBType
     double g;
     double b;
 };
+int winningObjectIndex(vector<double>);
 
 void save_image(const char *filename, int w, int h, int dpi, RGBType *data)
 {
@@ -119,9 +120,15 @@ int main(int argc, char *argv[])
     MyLight scene_light(light_pos, white_light);
 
     // Scene objects
-        MySphere scene_sphere(origin, 1, green_color);
-        Plane scene_plane(Y, -1, maroon);
+    MySphere scene_sphere(origin, 1, green_color);
+    Plane scene_plane(Y, -1, maroon);
 
+    //stack the scene objects
+
+
+    vector<MySceneObject*> objects ;
+    objects.push_back(dynamic_cast<MySceneObject*>(&scene_sphere));
+    objects.push_back(dynamic_cast<MySceneObject*>(&scene_plane));
     int index;
     double xamnt, yamnt;
     for (int x = 0; x < SCREEN_WIDTH; x++)
@@ -143,6 +150,20 @@ int main(int argc, char *argv[])
             Vect cam_ray_dir = camDir.vectAdd(camright.vectMult(xamnt - 0.5).vectAdd(camdown.vectMult(yamnt - 0.5))).normalize();
             Ray cam_ray(cam_ray_origin, cam_ray_dir);
 
+            vector<double> intersections ; 
+            
+            //Check for intersection with each of the objects in tthe buffer
+            for(size_t obj_index = 0; obj_index < objects.size(); obj_index++)
+            {
+                intersections.push_back(objects.at(obj_index) ->findRayIntersection(cam_ray));
+            }
+
+            //Determine which object is closer to the camera
+
+            int index_winning_object = winningObjectIndex(intersections);
+            
+            
+
 
             
             // index = (y * SCREEN_WIDTH) + x;
@@ -152,4 +173,38 @@ int main(int argc, char *argv[])
         }
     }
     save_image("/home/netra/NET2D/NET2d/fu.bmp", SCREEN_WIDTH, SCREEN_HEIGHT, DPI, pixels);
+}
+
+int winningObjectIndex(vector<double> obj_intersections){
+    if ( obj_intersections.size() == 0) {
+        return -1;
+    }
+    if ( obj_intersections.size() == 1) {
+        if ( obj_intersections.at(0) > 0) {
+            return 0; 
+        } else {
+            return -1;
+        }
+    }
+    double max = 0;
+    for(size_t i = 0; i < obj_intersections.size(); i++) {
+        if (max < obj_intersections.at(i)) {
+            max  < obj_intersections.at(i);
+        }
+        
+    }
+    if (max > 0) {
+        int index_min;
+        for(size_t i = 0; i < obj_intersections.size(); i++)
+        {
+            if (obj_intersections.at(i) > 0 && obj_intersections.at(i) <= max) {
+                max = obj_intersections.at(i);
+                index_min = i;
+            }
+        }
+        return index_min;
+        
+    } else {
+        return -1;
+    }
 }
